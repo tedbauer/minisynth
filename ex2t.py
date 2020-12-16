@@ -17,6 +17,9 @@ GRAMMAR = """
   | term "/"  item      -> div
   | term ">>" item      -> rshift
   | term "<<" item      -> lshift
+  | term "^" item       -> xor
+  | term "|" item       -> xor
+  | term "%" item       -> mod
 
 ?item: NUMBER           -> num
   | "-" item            -> neg
@@ -55,7 +58,7 @@ class Interp(Transformer):
 
     from operator import (
         add, sub, mul, neg, lshift, rshift,
-        truediv as div,
+        truediv as div, mod, xor
     )
 
     num = int
@@ -92,7 +95,7 @@ class Pretty(Transformer):
         return self.par('{} ? {} : {}'.format(cond, true, false))
 
     def __default__(self, op, lhs, rhs):
-        assert op in ('add', 'sub', 'mul', 'div', 'lshift', 'rshift')
+        assert op in ('add', 'sub', 'mul', 'div', 'lshift', 'rshift', 'xor', 'mod')
         c = {
             'add': '+',
             'sub': '-',
@@ -100,6 +103,8 @@ class Pretty(Transformer):
             'div': '/',
             'lshift': '<<',
             'rshift': '>>',
+            'mod': '%',
+            'xor': '^'
         }[op]
         return self.par('{} {} {}'.format(lhs, c, rhs))
 
